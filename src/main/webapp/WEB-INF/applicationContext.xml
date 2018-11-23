@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<!-- auto wired -->
+	<context:annotation-config/>
+    <context:component-scan base-package="com.spring.marcom174.dao"/>
+    <context:component-scan base-package="com.spring.marcom174.service"/>
+    
+    <!-- logging properti ke database -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>WEB-INF/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- session untuk connect ke database oracle -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="defaultAutoCommit" value="false"/>
+	</bean>
+	
+	<!-- session factory hibernate Model -->
+	<bean class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+		id="sessionFactory">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.spring.marcom174.model.EmployeeModel</value>
+				<value>com.spring.marcom174.model.CompanyModel</value>
+				<value>com.spring.marcom174.model.EventModel</value>
+				<value>com.spring.marcom174.model.SouvenirRequestModel</value>
+				<value>com.spring.marcom174.model.SouvenirRequestDetailModel</value>
+				<value>com.spring.marcom174.model.EventModel</value>
+				<value>com.spring.marcom174.model.SouvenirModel</value>
+				<value>com.spring.marcom174.model.SouvenirStockModel</value>
+				<value>com.spring.marcom174.model.SequenceModel</value>
+				<value>com.spring.marcom174.model.UserModel</value>
+				<value>com.spring.marcom174.model.RoleModel</value>
+				<value>com.spring.marcom174.model.MenuModel</value>
+				<value>com.spring.marcom174.model.UserAccessModel</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<tx:annotation-driven/>
+</beans>
